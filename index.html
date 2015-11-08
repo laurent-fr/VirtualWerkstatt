@@ -1,0 +1,337 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+
+<link rel="stylesheet" href="bower_components/pure/build/pure-min.css" />
+<script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js" ></script>
+<script type="text/javascript" src="bower_components/jquery-ui/jquery-ui.min.js" ></script>
+<script type="text/javascript" src="bower_components/jQuery-Knob/dist/jquery.knob.min.js" ></script>
+<link rel="stylesheet" href="bower_components/jQuery-switchButton/jquery.switchButton.css" />
+<script type="text/javascript" src="bower_components/jQuery-switchButton/jquery.switchButton.js" ></script>
+<script type="text/javascript" src="table.js" ></script>
+<script type="text/javascript" src="synth.js" ></script>
+<link rel="stylesheet" href="synth.css" />
+<script type="text/javascript" src="ui.js" ></script>
+
+</head>
+<body>
+
+	<div class="small-banner">
+	Virtual Werkstatt - Analog Synthesizer - Source code on <a target= "_blank" href="https://github.com/laurent-fr/VirtualWerkstatt">Github</a> - 
+	Follow me on <a target= "_blank" href="https://twitter.com/_Laurent_Fr_">Twitter</a> :-)
+	</div>
+
+	<div class="pure-g">
+	    <div class="pure-u-1-2">
+		
+			<div class="pure-g rounded-box">
+			
+				<span class="box-title">
+					VCO
+				</span>
+			
+				<div class="pure-u-1">
+				<div class="pure-g" >
+					<div class="pure-u-1-3 box-content">
+						<input id="vco-freq" class="knob"  data-min="8" data-max="16000" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333" value="440">
+						
+					</div>
+					
+					<div class="pure-u-1-3 box-content">
+						<p><input id="vco-wave" type="checkbox"></p>
+					</div>
+			
+					<div class="pure-u-1-3 box-content">
+						<input id="vco-pwm" class="knob" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333" value="50">
+						
+					</div>
+				
+				</div>
+				</div>
+					
+				<div class="pure-u-1">
+				<div class="pure-g" >
+					<div class="pure-u-1-3 box-label">
+						<p>FREQ</p>
+					</div>
+					<div class="pure-u-1-3 box-label">
+						<p>WAVE</p>
+					</div>
+					<div class="pure-u-1-3 box-label">
+						<p>PWM</p>
+					</div>
+				
+				</div>
+				</div>
+			
+					
+				
+			</div>
+		
+		</div>
+		
+	    <div class="pure-u-1-3">
+			<div class="pure-g rounded-box">
+			
+				<span class="box-title">
+					VCF
+				</span>
+				
+				<div class="pure-u-1">
+				<div class="pure-g" >
+					<div class="pure-u-1-2 box-content">
+						<input id="vcf-cutoff" class="knob" data-min="20" data-max="20000" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333">	
+					</div>
+					<div class="pure-u-1-2 box-content">
+						<input id="vcf-res" class="knob" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333">	
+					</div>
+				</div>
+				</div>
+				
+				<div class="pure-u-1">
+				<div class="pure-g" >
+					<div class="pure-u-1-2 box-label">
+						<p>CUTOFF</p>
+					</div>
+					<div class="pure-u-1-2 box-label">
+						<p>RES</p>
+					</div>
+				</div>
+				</div>
+		
+			</div>
+		</div>
+		
+		<div class="pure-u-1-6">
+			<div class="pure-g rounded-box">
+			
+				<span class="box-title">
+					VCA
+				</span>			
+				
+				<div class="pure-u-1">
+				<div class="pure-g" >
+					<div class="pure-u-1-1 box-content">
+						<p><input id="vca-mode" type="checkbox"></p>
+					</div>
+				</div>
+				</div>
+				
+				<div class="pure-u-1">
+				<div class="pure-g" >
+					<div class="pure-u-1-1 box-label">
+						<p>MODE</p>
+					</div>
+				</div>
+				</div>
+				
+			</div>
+		</div>
+	   
+	</div>	
+	
+	<div class="pure-g">
+		<div class="pure-u-1-2">
+			<div class="pure-g rounded-box">
+				<span class="box-title">VCO MOD</span>
+				
+					<div class="pure-u-1">
+					<div class="pure-g" >
+						<div class="pure-u-1-3 box-content">
+							<p><input id="vco-mod-source" type="checkbox" ></p>
+						</div>
+						
+						<div class="pure-u-1-3 box-content">
+							<input id="vco-mod-amount" class="knob" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333">
+
+						</div>
+
+						<div class="pure-u-1-3 box-content">
+							<p><input id="vco-mod-dest" type="checkbox" ></p>
+						</div>
+						
+					</div>
+					</div>
+					
+					<div class="pure-u-1">
+					<div class="pure-g" >
+						<div class="pure-u-1-3 box-label">
+							<p>SOURCE</p>
+						</div>
+						<div class="pure-u-1-3 box-label">
+							<p>AMOUNT</p>
+						</div>
+						<div class="pure-u-1-3 box-label">
+							<p>DEST</p>
+						</div>
+
+					</div>
+					</div>
+		
+			</div>
+		</div>
+		
+		<div class="pure-u-1-2">
+			<div class="pure-g rounded-box">
+				<span class="box-title">VCF MOD</span>
+				
+				<div class="pure-u-1">
+				<div class="pure-g" >
+					<div class="pure-u-1-3 box-content">
+						<p><input id="vcf-mod-source" type="checkbox"></p>
+					</div>
+					
+					<div class="pure-u-1-3 box-content">
+						<input id="vcf-mod-amount" class="knob" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333" value="35">
+
+					</div>
+
+					<div class="pure-u-1-3 box-content">
+						<p><input id="vcf-mod-polarity" type="checkbox" ></p>
+					</div>
+					
+				</div>
+				</div>
+					
+				<div class="pure-u-1">
+				<div class="pure-g" >
+					<div class="pure-u-1-3 box-label">
+						<p>SOURCE</p>
+					</div>
+					<div class="pure-u-1-3 box-label">
+						<p>AMOUNT</p>
+					</div>
+					<div class="pure-u-1-3 box-label">
+						<p>POLARITY</p>
+					</div>
+
+				</div>
+				</div>
+			
+		
+			</div>
+		</div>
+		
+	</div>
+	
+	<div class="pure-g">
+		<div class="pure-u-1-2">
+			<div class="pure-g rounded-box">
+				<span class="box-title">LFO</span>
+				
+					<div class="pure-u-1">
+					<div class="pure-g" >
+						<div class="pure-u-1-12 box-content">
+						<div class="led" id="lfo-led"> </div>
+						</div>
+
+						<div class="pure-u-5-12 box-content">
+							<input id="lfo-rate" class="knob" data-min="0.2" data-max="600" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333">
+
+						</div>
+
+						<div class="pure-u-1-2 box-content">
+							<p><input id="lfo-wave" type="checkbox" ></p>
+						</div>
+
+					</div>
+					</div>
+
+					<div class="pure-u-1">
+					<div class="pure-g" >
+						<div class="pure-u-1-12"> </div>
+						<div class="pure-u-5-12 box-label">
+							<p>RATE</p>
+						</div>
+						<div class="pure-u-1-2 box-label">
+							<p>WAVE</p>
+						</div>
+					</div>
+					</div>
+				
+		
+			</div>
+		</div>
+		
+		<div class="pure-u-1-2">
+			<div class="pure-g rounded-box">
+				<span class="box-title">ENVELOPE</span>
+				
+				<div class="pure-u-1">
+				<div class="pure-g" >
+					<div class="pure-u-1-3 box-content">
+						<p><input id="envelope-sustain" type="checkbox"></p>
+					</div>
+					
+					<div class="pure-u-1-3 box-content">
+						<input id="envelope-attack" class="knob" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333">
+					</div>
+					
+					<div class="pure-u-1-3 box-content">
+						<input id="envelope-decay" class="knob" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333">
+					</div>
+
+					
+				</div>	
+				</div>
+					
+				<div class="pure-u-1">
+				<div class="pure-g" >
+					<div class="pure-u-1-3 box-label">
+						<p>SUSTAIN</p>
+					</div>
+					<div class="pure-u-1-3 box-label">
+						<p>ATTACK</p>
+					</div>
+					<div class="pure-u-1-3 box-label">
+						<p>DECAY</p>
+					</div>
+				</div>
+				</div>
+				
+		
+			</div>
+		</div>
+		
+	</div>
+	
+	<div class="pure-g piano" >
+		<div class="pure-u-1-3">
+		<div class="pure-g piano-content">
+			<div class="pure-u-1 box-content">
+			<input id="note-glide" class="knob" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333">
+			</div>
+			<div class="pure-u-1-1 box-label">
+				<p>GLIDE</p>
+			</div>
+		</div>
+		</div>
+		
+		<div class="pure-u-1-24"><button id="key-s" class="piano-key bottom">S</button></div>
+		<div class="pure-u-1-24"><button id="key-e" class="piano-key top">E</button></div>
+		<div class="pure-u-1-24"><button id="key-d" class="piano-key bottom">D</button></div>
+		<div class="pure-u-1-24"><button id="key-r" class="piano-key top">R</button></div>
+		<div class="pure-u-1-24"><button id="key-f" class="piano-key bottom">F</button></div>
+		
+		<div class="pure-u-1-24"></div>
+		
+		<div class="pure-u-1-24"><button id="key-g" class="piano-key bottom">G</button></div>
+		<div class="pure-u-1-24"><button id="key-y" class="piano-key top">Y</button></div>
+		<div class="pure-u-1-24"><button id="key-h" class="piano-key bottom">H</button></div>
+		<div class="pure-u-1-24"><button id="key-u" class="piano-key top">U</button></div>
+		<div class="pure-u-1-24"><button id="key-j" class="piano-key bottom">J</button></div>
+		<div class="pure-u-1-24"><button id="key-i" class="piano-key top">I</button></div>
+		<div class="pure-u-1-24"><button id="key-k" class="piano-key bottom">K</button></div>
+		
+		<div class="pure-u-1-24"></div>
+		
+		<div class="pure-u-1-24"><button id="key-l" class="piano-key bottom">L</button></div>
+		
+		<div class="pure-u-1-24"></div>
+		
+	</div>
+	
+</body>
+
+</html>
