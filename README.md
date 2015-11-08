@@ -1,6 +1,8 @@
 # VirtualWerkstatt
 A virtual Analog Synthesizer which tries to emulate a Moog Werkstatt-01 on a Web page !
 
+Try it online here (warning, sound !) : http://laurent-fr.github.io/VirtualWerkstatt/
+
 Have a look at the real thing here : http://www.moogmusic.com/products/semi-modular/werkstatt-01-moogfest-2014-kit
 
 ## Building the sources :
