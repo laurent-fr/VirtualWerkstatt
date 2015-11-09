@@ -141,3 +141,6 @@ body {
 	top:1px;
 }
 
+.ui-button-text {
+	font-size:50%;
+}

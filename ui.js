@@ -39,6 +39,7 @@ $(document).ready(function($) {
 		switch(evt.currentTarget.id) {
 			case "vco-wave": VCOwave = value; break;
 			case "lfo-wave": LFOwave = value; break;
+			case "lfo-tracking": LFOtracking = value; break;
 			case "vco-mod-source" : VCOMODsource = value; break;
 			case "vco-mod-dest" : VCOMODdest = value; break;
 			case "envelope-sustain": ENVELOPEsustain = value ; break;
@@ -140,6 +141,8 @@ $(document).ready(function($) {
 	});
 	
 	
+	$( "#lfo-tracking" ).button();
+	
 	setInterval(function() {
 		var intensity = Math.floor((LFOout+1)*128);
 		
@@ -156,6 +159,7 @@ $(document).ready(function($) {
 	$('#vco-mod-dest').prop('checked',false);
 	$('#lfo-rate').val(5).trigger('change');
 	$('#lfo-wave').prop('checked',false);
+	$('#lfo-tracking').prop('checked',false);
 	$('#vcf-cutoff').val(20000).trigger('change');
 	$('#vcf-res').val(0).trigger('change');
 	$('#vca-mode').prop('checked',false);
