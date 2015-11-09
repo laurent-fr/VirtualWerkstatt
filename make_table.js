@@ -139,7 +139,8 @@ fs.writeFileSync(out_file, js);
 
 
 /*var plot='';
-for(i=0;i<4096;i++) { plot+=i+" "+data[i]; "\n";}
+var data_plot=table(60,512);
+for(i=0;i<data_plot.length;i++) { plot+=i+" "+data_plot[i]+ "\r\n";}
 fs.writeFileSync('out.dat',plot);
 */
 
