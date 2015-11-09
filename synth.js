@@ -116,7 +116,7 @@ function pulse(freq,phase,pwm) {
 	var t=phase+pwm;
 	while(t>=1) t-=1;
 	
-	return (saw(freq,phase)-saw(freq,t))/2.5;
+	return (saw(freq,phase)-saw(freq,t))*0.9+(1-pwm)*0.7;
   	
 }
 
@@ -239,7 +239,7 @@ function getAudio() {
 	var cutoffPitch = 1;
 	var cutoffPitchSign= 1;
 	if (VCFMODpolarity==false) cutoffPitchSign=-1;
-	if (VCOMODsource==false) {
+	if (VCFMODsource==false) {
 		cutoffPitch=Math.pow(2,LFOout*VCFMODamount*cutoffPitchSign);
 	} else {
 		cutoffPitch=Math.pow(2,ENVELOPEvalue*VCFMODamount*cutoffPitchSign);
@@ -248,6 +248,8 @@ function getAudio() {
 	
 	
 	//VCF
+	if (VCOout>1) VCOout=1;
+	if (VCOout<-1) VCOout=-1;
 	var input = VCOout;
 	var x = input - VCFr*VCFy4;
 

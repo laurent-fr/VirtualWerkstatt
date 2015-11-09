@@ -42,6 +42,8 @@ $(document).ready(function($) {
 			case "vco-mod-source" : VCOMODsource = value; break;
 			case "vco-mod-dest" : VCOMODdest = value; break;
 			case "envelope-sustain": ENVELOPEsustain = value ; break;
+			case "vcf-mod-source": VCFMODsource = value ; break;
+			case "vcf-mod-polarity": VCFMODpolarity = value ; break;
 			case "vca-mode": VCAmode = value; break;
 		}
 	});
