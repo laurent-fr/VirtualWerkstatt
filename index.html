@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="bower_components/pure/build/pure-min.css" />
 <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js" ></script>
 <script type="text/javascript" src="bower_components/jquery-ui/jquery-ui.min.js" ></script>
+<link rel="stylesheet" href="bower_components/jquery-ui/themes/ui-darkness/jquery-ui.min.css" />
 <script type="text/javascript" src="bower_components/jQuery-Knob/dist/jquery.knob.min.js" ></script>
 <link rel="stylesheet" href="bower_components/jQuery-switchButton/jquery.switchButton.css" />
 <script type="text/javascript" src="bower_components/jQuery-switchButton/jquery.switchButton.js" ></script>
@@ -82,6 +83,7 @@
 				<div class="pure-g" >
 					<div class="pure-u-1-2 box-content">
 						<input id="vcf-cutoff" class="knob" data-min="20" data-max="20000" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333">	
+						
 					</div>
 					<div class="pure-u-1-2 box-content">
 						<input id="vcf-res" class="knob" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333">	
@@ -225,10 +227,10 @@
 						<div class="pure-u-1-12 box-content">
 						<div class="led" id="lfo-led"> </div>
 						</div>
-
+						
 						<div class="pure-u-5-12 box-content">
+								
 							<input id="lfo-rate" class="knob" data-min="0.2" data-max="600" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333">
-
 						</div>
 
 						<div class="pure-u-1-2 box-content">
@@ -242,7 +244,7 @@
 					<div class="pure-g" >
 						<div class="pure-u-1-12"> </div>
 						<div class="pure-u-5-12 box-label">
-							<p>RATE</p>
+							<p>RATE <input type="checkbox" id="lfo-tracking"><label for="lfo-tracking">Tracking</label></p>
 						</div>
 						<div class="pure-u-1-2 box-label">
 							<p>WAVE</p>

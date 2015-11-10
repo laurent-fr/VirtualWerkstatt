@@ -33,6 +33,7 @@ var LFOfreq=5; // .2 - 600Hz
 var LFOphase=0;
 var LFOout=0;
 var LFOwave=false;
+var LFOtracking=false;
 
 // VCA
 var VCAmode=false;
@@ -188,7 +189,10 @@ function getAudio() {
 	calcEnvelope();
 	
 	// LFO
-	LFOphase+=LFOfreq/fs;
+	var lfo_freq=LFOfreq
+	if (LFOtracking==true) { lfo_freq*=Math.pow(2,NoteOutValue); }
+	LFOphase+=lfo_freq/fs;
+
 	while(LFOphase<0) LFOphase+=1;
 	while(LFOphase>=1) LFOphase-=1;
 	
