@@ -1,7 +1,14 @@
 "use strict";
 
 var audioContext;
+try {
+  window.AudioContext = window.AudioContext || window.webkitAudioContext;
+  audioContext = new AudioContext();
+} catch(e) {
+  alert('Web Audio API is not supported in this browser, try Chrome or Firefox !');
+}
 
+var fs=audioContext.sampleRate;
 
 var table_def=[
 	{ f:8, n: 1000, l:4096 },
@@ -68,8 +75,6 @@ var ENVELOPEstate=0; // 1=attack , 2=sustain, 3=release
 var NOTEglide=0;
 var NoteValue=0;
 var NoteOutValue=0;
-
-var fs=44100;
 
 
 function VCFUpdateCutoff(cutoff) {
@@ -280,14 +285,9 @@ function getAudio() {
 }
 
 
-try {
-  window.AudioContext = window.AudioContext || window.webkitAudioContext;
-  audioContext = new AudioContext();
-} catch(e) {
-  alert('Web Audio API is not supported in this browser');
-}
 
-var bufferSize = 4096;
+
+var bufferSize = 256;
 var myPCMProcessingNode = audioContext.createScriptProcessor(bufferSize, 1, 1);
 myPCMProcessingNode.onaudioprocess = function(e) {
   var output = e.outputBuffer.getChannelData(0);
@@ -297,4 +297,4 @@ myPCMProcessingNode.onaudioprocess = function(e) {
   }
 }
 myPCMProcessingNode.connect(audioContext.destination);
-//myPCMProcessingNode.start(0);
+
