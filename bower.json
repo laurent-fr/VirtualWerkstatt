@@ -21,7 +21,7 @@
   ],
   "dependencies": {
     "jquery": "~2.1.4",
-    "pure": "yahoo/pure#~0.6.0",
+    "pure": "yahoo/pure-release#~0.6.0",
     "jQuery-switchButton": "olance/jQuery-switchButton",
     "jquery-ui": "~1.11.4",
     "jQuery-Knob": "aterrien/jquery-knob#~1.2.12"
