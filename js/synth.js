@@ -122,7 +122,10 @@ function pulse(freq,phase,pwm) {
 	var t=phase+pwm;
 	while(t>=1) t-=1;
 	
-	return (saw(freq,phase)-saw(freq,t))*0.9+(1-pwm)*0.7;
+	var out=(saw(freq,phase)-saw(freq,t))*0.9+0.5-pwm;
+	if (out<-1) return -1;
+	if (out>1) return 1;
+	return out;
   	
 }
 
