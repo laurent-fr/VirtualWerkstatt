@@ -171,7 +171,24 @@ $(document).ready(function($) {
 	});
 	
 	
-	$( "#lfo-tracking" ).button();
+	$( "#lfo-tracking, #vco-c4, #vco-8up, #vco-8down" ).button();
+	
+	$("#vco-c4").click( function(evt) {
+		$('#vco-freq').val(revLogValue(261.626,8,16000)).trigger('change');
+	});
+	
+	$("#vco-8down").click( function(evt) {
+		var freq=$('#vco-freq').val()/2;
+		if (freq<16) return;
+		$('#vco-freq').val(revLogValue(freq,8,16000)).trigger('change');
+	});
+	
+	$("#vco-8up").click( function(evt) {
+		var freq=$('#vco-freq').val()*2;
+		if (freq>16000) return;
+		$('#vco-freq').val(revLogValue(freq,8,16000)).trigger('change');
+	});
+	
 	
 	setInterval(function() {
 		var intensity = Math.floor((LFOout+1)*128);
@@ -179,6 +196,7 @@ $(document).ready(function($) {
 		$('#lfo-led').css('background-color','rgb('+intensity+',0,0)');
 	}, 50);
 	
+
 	
 	// INIT 
 	$('#vco-freq').val(revLogValue(261.626,8,16000)).trigger('change');

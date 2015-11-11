@@ -249,9 +249,9 @@ function getAudio() {
 	var cutoffPitchSign= 1;
 	if (VCFMODpolarity==false) cutoffPitchSign=-1;
 	if (VCFMODsource==false) {
-		cutoffPitch=Math.pow(2,LFOout*VCFMODamount*cutoffPitchSign);
+		cutoffPitch=Math.pow(2,LFOout*VCFMODamount*4*cutoffPitchSign);
 	} else {
-		cutoffPitch=Math.pow(2,ENVELOPEvalue*VCFMODamount*cutoffPitchSign);
+		cutoffPitch=Math.pow(2,ENVELOPEvalue*VCFMODamount*4*cutoffPitchSign);
 	}
 	VCFUpdateCutoff(VCFcutoff*cutoffPitch);
 	
