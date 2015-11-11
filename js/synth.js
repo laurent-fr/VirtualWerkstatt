@@ -255,10 +255,10 @@ function getAudio() {
 	}
 	VCFUpdateCutoff(VCFcutoff*cutoffPitch);
 	
-	
-	//VCF
 	if (VCOout>1) VCOout=1;
 	if (VCOout<-1) VCOout=-1;
+	
+	//VCF - http://musicdsp.org/showArchiveComment.php?ArchiveID=24
 	var input = VCOout;
 	var x = input - VCFr*VCFy4;
 
@@ -276,18 +276,20 @@ function getAudio() {
 	VCFoldy2 = VCFy2;
 	VCFoldy3 = VCFy3;
 	
+	if (VCFy4<-1) VCFy4=-1;
+	if (VCFy4>1) VCFy4=1;
+	
 	var out = VCFy4;
 
+	// VCA
 	if (VCAmode==true) return out;
-
-	
 	return out*ENVELOPEvalue;
 }
 
 
 
 
-var bufferSize = 256;
+var bufferSize = 1024;
 var myPCMProcessingNode = audioContext.createScriptProcessor(bufferSize, 1, 1);
 myPCMProcessingNode.onaudioprocess = function(e) {
   var output = e.outputBuffer.getChannelData(0);

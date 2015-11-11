@@ -1,4 +1,5 @@
 $(document).ready(function($) {
+
 	$(".knob").knob({
 	                change : function (value) {
 						var id=this.$[0].id;
@@ -7,11 +8,40 @@ $(document).ready(function($) {
 					
 	});
 	
+	function logValue(v,min,max) {
+		return (max-min)*Math.pow(1.1,v*100/max-100)+min;
+	}
+	
+	function revLogValue(l,min,max) {
+		return (max/100)*(Math.log((l-min)/(max-min))/Math.log(1.1)+100);
+	}
+	
+	$(".knob-log").knob({
+	                change : function (value) {
+						console.log('change !');
+						var id=this.$[0].id; 
+						knob_change(id,logValue(value,this.o.min,this.o.max));
+					},
+					format: function(v) {
+                        var log = logValue(v,this.min,this.max);
+						var strLog =log.toString();
+						if (strLog.substring(4,5)==".") return strLog.substring(0,4);
+						return strLog.substring(0,5);
+                    }
+					
+	});
+	
 	$(".knob").change(function(evt) {
 		var id = evt.currentTarget.id;
 		var value = evt.currentTarget.value;
 		knob_change(id,value);
 		
+	});
+	
+	$(".knob-log").change(function(evt) {
+		var id = evt.currentTarget.id;
+		var value = evt.currentTarget.value;
+		knob_change(id,value);
 	});
 	
 	
@@ -151,13 +181,13 @@ $(document).ready(function($) {
 	
 	
 	// INIT 
-	$('#vco-freq').val(261.63).trigger('change');
+	$('#vco-freq').val(revLogValue(261.626,8,16000)).trigger('change');
     $('#vco-wave').prop('checked',false);
 	$('#vco-pwm').val(50).trigger('change');
 	$('#vco-mod-source').prop('checked',false);
 	$('#vco-mod-amount').val(0).trigger('change');
 	$('#vco-mod-dest').prop('checked',false);
-	$('#lfo-rate').val(5).trigger('change');
+	$('#lfo-rate').val(revLogValue(5,0.2,600)).trigger('change');
 	$('#lfo-wave').prop('checked',false);
 	$('#lfo-tracking').prop('checked',false);
 	$('#vcf-cutoff').val(20000).trigger('change');
