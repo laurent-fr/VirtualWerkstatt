@@ -70,6 +70,7 @@ $(document).ready(function($) {
 			case "vco-wave": VCOwave = value; break;
 			case "lfo-wave": LFOwave = value; break;
 			case "lfo-tracking": LFOtracking = value; break;
+			case "vcf-tracking": VCFtracking = value; break;
 			case "vco-mod-source" : VCOMODsource = value; break;
 			case "vco-mod-dest" : VCOMODdest = value; break;
 			case "envelope-sustain": ENVELOPEsustain = value ; break;
@@ -171,7 +172,7 @@ $(document).ready(function($) {
 	});
 	
 	
-	$( "#lfo-tracking, #vco-c4, #vco-8up, #vco-8down" ).button();
+	$( "#lfo-tracking, #vcf-tracking, #vco-c4, #vco-8up, #vco-8down" ).button();
 	
 	$("#vco-c4").click( function(evt) {
 		$('#vco-freq').val(revLogValue(261.626,8,16000)).trigger('change');

@@ -47,6 +47,7 @@ var VCAmode=false;
 
 //VCF
 var VCFcutoff=20000; // 20hz - 20Khz
+var VCFtracking=false;
 var VCFp=0;
 var VCFk=0;
 var VCFr=0;
@@ -197,7 +198,7 @@ function getAudio() {
 	calcEnvelope();
 	
 	// LFO
-	var lfo_freq=LFOfreq
+	var lfo_freq=LFOfreq;
 	if (LFOtracking==true) { lfo_freq*=Math.pow(2,NoteOutValue); }
 	LFOphase+=lfo_freq/fs;
 
@@ -256,7 +257,9 @@ function getAudio() {
 	} else {
 		cutoffPitch=Math.pow(2,ENVELOPEvalue*VCFMODamount*4*cutoffPitchSign);
 	}
-	VCFUpdateCutoff(VCFcutoff*cutoffPitch);
+	var cutoff_freq = VCFcutoff;
+	if (VCFtracking==true) { cutoff_freq*=Math.pow(2,NoteOutValue); }
+	VCFUpdateCutoff(cutoff_freq*cutoffPitch);
 	
 	if (VCOout>1) VCOout=1;
 	if (VCOout<-1) VCOout=-1;
