@@ -172,7 +172,7 @@ $(document).ready(function($) {
 	});
 	
 	
-	$( "#lfo-tracking, #vcf-tracking, #vco-c4, #vco-8up, #vco-8down" ).button();
+	$( "#lfo-tracking, #vcf-tracking, #vco-c4, #vco-8up, #vco-8down, #lfo-copy-vco, #lfo-plus-half,#lfo-minus-half" ).button();
 	
 	$("#vco-c4").click( function(evt) {
 		$('#vco-freq').val(revLogValue(261.626,8,16000)).trigger('change');
@@ -190,6 +190,25 @@ $(document).ready(function($) {
 		$('#vco-freq').val(revLogValue(freq,8,16000)).trigger('change');
 	});
 	
+	$("#lfo-copy-vco").click( function(evt)  {
+		var freq=$('#vco-freq').val();
+		while (freq>600) freq/=2;
+		$('#lfo-rate').val(revLogValue(freq,0.2,600)).trigger('change');
+	});
+	
+	$("#lfo-minus-half").click( function(evt)  {
+		var freq=$('#lfo-rate').val();
+		freq*=Math.pow(2,-1/12);
+		if (freq<0.2) return;
+		$('#lfo-rate').val(revLogValue(freq,0.2,600)).trigger('change');
+	});
+	
+	$("#lfo-plus-half").click( function(evt)  {
+		var freq=$('#lfo-rate').val();
+		freq*=Math.pow(2,1/12);
+		if (freq>600) return;
+		$('#lfo-rate').val(revLogValue(freq,0.2,600)).trigger('change');
+	});
 	
 	setInterval(function() {
 		var intensity = Math.floor((LFOout+1)*128);
