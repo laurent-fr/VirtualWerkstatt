@@ -1,11 +1,13 @@
+"use strict";
+
 $(document).ready(function($) {
 
 	$(".knob").knob({
-	                change : function (value) {
-						var id=this.$[0].id;
-						knob_change(id,value/100);
-					}
-					
+	    change : function (value) {
+			var id=this.$[0].id;
+			knob_change(id,value/100);
+		}
+		
 	});
 	
 	function logValue(v,min,max) {
@@ -17,18 +19,18 @@ $(document).ready(function($) {
 	}
 	
 	$(".knob-log").knob({
-	                change : function (value) {
-						console.log('change !');
-						var id=this.$[0].id; 
-						knob_change(id,logValue(value,this.o.min,this.o.max));
-					},
-					format: function(v) {
-                        var log = logValue(v,this.min,this.max);
-						var strLog =log.toString();
-						if (strLog.substring(4,5)==".") return strLog.substring(0,4);
-						return strLog.substring(0,5);
-                    }
-					
+	    change : function (value) {
+			console.log('change !');
+			var id=this.$[0].id; 
+			knob_change(id,logValue(value,this.o.min,this.o.max));
+		},
+		format: function(v) {
+			var log = logValue(v,this.min,this.max);
+			var strLog =log.toString();
+			if (strLog.substring(4,5)==".") return strLog.substring(0,4);
+			return strLog.substring(0,5);
+        }
+		
 	});
 	
 	$(".knob").change(function(evt) {
@@ -235,7 +237,7 @@ $(document).ready(function($) {
 	};
 	
 	
-	for(key in params) {
+	for(var key in params) {
 		console.log('init:',key,params[key]);
 		var el = $('#'+key);
 		switch(el.get(0).className) {

@@ -1,3 +1,4 @@
+"use strict";
 
 var VCO = {
 
@@ -6,6 +7,8 @@ var VCO = {
 	freq:0,
 	pwm:0, // 0 - 1
 	fs: 48000,
+	min:0,
+	max:0,
 	
 	new: function(fs) {
 		var obj = Object.create(this);
@@ -14,15 +17,15 @@ var VCO = {
 	},
 	
 	_interpolate: function(table,p) {
-		if (typeof p === 'undefined') p = this.phase*table.length;
+		if (typeof p === 'undefined') p = this.phase*table.length; else p*=table.length;
 		var t = Math.floor(p);
 		var frac = p-t;  
 		var t1=t+1;
 		if (t1==table.length) t1=0;
 		
-		var out = table[t]*(1-frac)+table[t1]*frac;
-		
-		if (isNaN(out)) console.log('interpolate',t,frac,t1,table.length);
+		//var out = table[t]*(1-frac)+table[t1]*frac;
+		var out=table[t];//TMP
+		//if (isNaN(out)) console.log('interpolate',t,frac,t1,table.length);
 		
 		if (out<-1) out=-1;
 		if (out>1) out=1;
@@ -56,6 +59,8 @@ var VCO = {
 		if (pwm<0) pwm=0;
 		if (pwm>1) pwm=1;
 		this.pwm=pwm;
+		this.min=0;
+		this.max=0;
 	},
 	
 	_addPhase: function()  {
@@ -73,7 +78,7 @@ var VCO = {
 		this._addPhase();
 		var num = this._get_table();
 		
-		this.out = this._interpolate(saw_table[num])/2;
+		this.out = this._interpolate(saw_table[num]);
 		return this.out;
 	},
 
@@ -85,9 +90,13 @@ var VCO = {
 	
 		var num = this._get_table();
 	
-		this.out=(this._saw(num,this.phase)-this._saw(num,t))*0.9+(this.pwm*2-1)*0.7;
+		this.out=( this._saw(num,this.phase) - this._saw(num,t) )*0.9+(this.pwm*2-1)*0.7;
 		if (this.out<-1) this.out=-1;
 		if (this.out>1) this.out=1;
+		
+		if (this.out<this.min) this.min=this.out;
+		if (this.out>this.max) this.max=this.out;
+		
 		return this.out;
   	},
 	
@@ -271,7 +280,7 @@ var Synth = {
 	},
 	
 	setParams:function(params) {
-		for (key in params) {
+		for (var key in params) {
 		console.log('setParams',key);
 			if (! (key in this.params) ) continue;
 			this.params[key] = params[key];

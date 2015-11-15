@@ -35,7 +35,7 @@ var amp=1.6;
 		out[t]+=(1/i)*Math.sin(i*t*2*Math.PI/length);
 	}
 	out[t]=-(amp/Math.PI)*out[t];
-	if ((out[t]<-1)||(out[t]>1)||(isNaN(out[t]))) console.log('ERR !',t,out[t]);
+	if ((out[t]<-1)||(out[t]>1)||(isNaN(out[t]))) console.log('saw ERR !',t,out[t]);
   }
   
   return out;	
@@ -53,6 +53,7 @@ var coef=8/(Math.PI*Math.PI);
 		sign=-sign;
 	}
 	out[t]*=coef;
+	if ((out[t]<-1)||(out[t]>1)||(isNaN(out[t]))) console.log('triangle ERR !',t,out[t]);
 	
   }
   return out;	
@@ -62,7 +63,7 @@ var coef=8/(Math.PI*Math.PI);
 function table_square(n,length) {
 
 var out=[];
-var coef=4/Math.PI;
+var coef=(4/Math.PI)*0.80;
 
   for(t=0;t<length;t++) {
 	out[t]=0;
@@ -70,6 +71,7 @@ var coef=4/Math.PI;
 		out[t]+=(1/i)*Math.sin(i*t*2*Math.PI/length);
 	}
 	out[t]*=coef;
+	if ((out[t]<-1)||(out[t]>1)||(isNaN(out[t]))) console.log('square ERR !',t,out[t]);
   }
   return out;	
 
