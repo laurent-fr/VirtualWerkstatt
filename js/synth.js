@@ -1,308 +1,341 @@
-"use strict";
 
-var audioContext;
-try {
-  window.AudioContext = window.AudioContext || window.webkitAudioContext;
-  audioContext = new AudioContext();
-} catch(e) {
-  alert('Web Audio API is not supported in this browser, try Chrome or Firefox !');
-}
+var VCO = {
 
-var fs=audioContext.sampleRate;
-
-var table_def=[
-	{ f:8, n: 1000, l:4096 },
-	{ f:22, n: 500, l: 4096},
-	{ f:44, n: 250, l:2048},
-	{ f:88, n: 125, l:2048 },
-	{ f:176,n: 60, l:2048},
-	{ f:350, n: 30 ,l:1024},
-	{ f:700, n:15, l:1024},
-	{ f:1400, n:7,l:512 },
-	{ f:3000, n:3,l:512 },
-	{ f:7300,n:1,l:256},
-];
-
-// VCO
-var VCOfreq=440; // 8hz - 16khz
-var VCOpwm=.5;
-var VCOout=0;
-var VCOwave=false;
-var VCOphase=0;
-
-// VCOMOD
-var VCOMODsource=false;
-var VCOMODamount=0.5;
-var VCOMODdest=false;
-
-//LFO
-var LFOfreq=5; // .2 - 600Hz
-var LFOphase=0;
-var LFOout=0;
-var LFOwave=false;
-var LFOtracking=false;
-
-// VCA
-var VCAmode=false;
-
-//VCF
-var VCFcutoff=20000; // 20hz - 20Khz
-var VCFtracking=false;
-var VCFp=0;
-var VCFk=0;
-var VCFr=0;
-var VCFy1=0;
-var VCFy2=0;
-var VCFy3=0;
-var VCFy4=0;
-var VCFoldx=0;
-var VCFoldy1=0;
-var VCFoldy2=0;
-var VCFoldy3=0;
-
-//VCFMOD
-var VCFMODsource=false;
-var VCFMODamount=0;
-var VCFMODpolarity=false;
-
-//ENVELOPE
-var ENVELOPEsustain=true;
-var ENVELOPEattack=0;
-var ENVELOPEdecay=0; // full = 5s
-var ENVELOPEvalue=0;
-var ENVELOPEstate=0; // 1=attack , 2=sustain, 3=release
-
-//Note
-var NOTEglide=0;
-var NoteValue=0;
-var NoteOutValue=0;
-
-
-function VCFUpdateCutoff(cutoff) {
-	if (cutoff<0) cutoff=0;
-	if (cutoff>20000) cutoff=20000;
-	var fc = cutoff*2/fs;
-	VCFp = fc*(1.8-0.8*fc);
-	VCFk = 2*Math.sin(fc*Math.PI/2)-1;
-}
-
-function VCFUpdateRes(res) {
-	console.log(res);
-	var t1 = (1-VCFp)*1.386249;
-	var t2 = 12+t1*t1;
-	VCFr = res*(t2+6*t1)/(t2-6*t1);
-}
-
-function saw(freq,phase) {  
+	out:0, //  0 - 1
+	phase:0, // 0 - 1
+	freq:0,
+	pwm:0, // 0 - 1
 	
-	var length=0;
-	var num=0;
-	
-for(var i=9;i>=0;i--) {
-	if (freq>=table_def[i].f) {
-		length=table_def[i].l;
-		num=i;
-		break;
-	}
-}	
-//console.log(num," ",length);	
-  //return  phase*2-1;
-  var p = phase*length;
-  var t = Math.floor(p);
-  var frac = p-t;  
-  var t1=t+1;
-  if (t1==length) t1=0;
-  return saw_table[num][t]*(1-frac)+saw_table[num][t1]*frac;
-
-}
-
-function pulse(freq,phase,pwm) {
- //if (phase<pwm) return -1;
- //return 1;
-
-	var t=phase+pwm;
-	while(t>=1) t-=1;
-	
-	var out=(saw(freq,phase)-saw(freq,t))*0.9+0.5-pwm;
-	if (out<-1) return -1;
-	if (out>1) return 1;
-	return out;
-  	
-}
-
-function triangle_lfo(phase) {
-	var p = phase*4096;
-	var t = Math.floor(p);
-	var frac = p-t;  
-	var t1=t+1;
-	if (t1==4096) t1=0;
-	return triangle_table[t]*(1-frac)+triangle_table[t1]*frac;
-}
-
-function square_lfo(phase) {
-	var p = phase*4096;
-	var t = Math.floor(p);
-	var frac = p-t;  
-	var t1=t+1;
-	if (t1==4096) t1=0;
-	return square_table[t]*(1-frac)+square_table[t1]*frac;
-}
-
-function calcEnvelope() {
-	
-	if (ENVELOPEstate==1) {
-		ENVELOPEvalue+=1/(ENVELOPEattack*(1*fs-1)+1);
+	_interpolate: function(table,p) {
+		if (typeof p === 'undefined') p = this.phase*table.length;
+		var t = Math.floor(p);
+		var frac = p-t;  
+		var t1=t+1;
+		if (t1==length) t1=0;
 		
-		if (ENVELOPEvalue>=1) {
-			ENVELOPEvalue=1;
-			ENVELOPEstate=2;
+		var out = table[t]*(1-frac)+table[t1]*frac;
+		
+		if (out<-1) out=-1;
+		if (out>1) out=1;
+		
+		return out;
+	},
+	
+	_get_table: function() {
+		var length=0;
+		var num=0;
+	
+		for(var i=9;i>=0;i--) {
+			if (this.freq>=table_def[i].f) {
+				length=table_def[i].l;
+				num=i;
+				break;
+			}
+		}	
+		
+		return num;
+	},
+	
+	addPhase: function(value)  {
+		this.phase+=value;
+		while (this.phase>1) this.phase-=1;
+		while (this.phase<0) this.phase+=1;
+	},
+	
+	_saw: function(num,phase) {
+		return this._interpolate(saw_table[num],phase);
+	},
+	
+	saw: function() {  
+		var num = this._get_table();
+		
+		this.out = this._interpolate(saw_table[num]);
+		return this.out;
+	},
+
+	pulse: function() {
+		var t=this.phase+this.pwm;
+		while(t>=1) t-=1;
+	
+		var num = this._get_table();
+	
+		this.out=(this._saw(num,this.phase)-this._saw(num,t))*0.9+0.5-this.pwm;
+		if (this.out<-1) this.out=-1;
+		if (this.out>1) this.out=1;
+		return this.out;
+  	},
+	
+	triangle_lfo: function() {
+		this.out = this._interpolate(triangle_table);
+		return this.out;
+	},
+
+	square_lfo: function() {
+		this.out = this._interpolate(square_table);
+		return this.out;
+	}
+
+};
+
+var VCF = {
+
+	// http://musicdsp.org/showArchiveComment.php?ArchiveID=24
+	
+	p:0,
+	k:0,
+	r:0,
+	y1:0, y2:0, y3:0, y4:0,
+	oldy1:0, oldy2:0, oldy3:0,
+	oldx:0,
+
+	updateCutoff: function(cutoff) {
+		if (cutoff<0) cutoff=0;
+		if (cutoff>20000) cutoff=20000;
+		var fc = cutoff*2/fs;
+		this.p = fc*(1.8-0.8*fc);
+		this.k = 2*Math.sin(fc*Math.PI/2)-1;
+	},
+
+	updateRes: function(res) {
+		//console.log(res);
+		var t1 = (1-this.p)*1.386249;
+		var t2 = 12+t1*t1;
+		this.r = res*(t2+6*t1)/(t2-6*t1);
+	},
+
+	filter: function(input) {
+	
+		if (input>1) input=1;
+		if (input<-1) input=-1;
+		
+		var x = input - this.r*this.y4;
+
+		//Four cascaded onepole filters (bilinear transform)
+		this.y1=x*this.p + this.oldx*this.p - this.k*this.y1;
+		this.y2=this.y1*this.p+this.oldy1*this.p - this.k*this.y2;
+		this.y3=this.y2*this.p+this.oldy2*this.p - this.k*this.y3;
+		this.y4=this.y3*this.p+this.oldy3*this.p - this.k*this.y4;
+
+		//Clipper band limited sigmoid
+		this.y4 -= (this.y4*this.y4*this.y4)/6;
+
+		this.oldx = x;
+		this.oldy1 = this.y1;
+		this.oldy2 = this.y2;
+		this.oldy3 = this.y3;
+	
+		if (this.y4<-1) this.y4=-1;
+		if (this.y4>1) this.y4=1;
+	
+		return this.y4;
+	
+	}
+
+};
+
+var EG = {
+
+	value:0,
+	state:0, // 1=attack , 2=sustain, 3=release
+	attack:0,
+	release:0,
+	sustain:false,
+
+	calculate: function() {
+	
+		if (this.state==1) {
+			this.value+=1/(this.attack*(1*fs-1)+1);
+		
+			if (this.value>=1) {
+				this.value=1;
+				this.state=2;
+			}
+			return;
 		}
-		
-		return;
-	}
 	
-	if (ENVELOPEstate==2) {
-		if (ENVELOPEsustain==false) ENVELOPEstate=3;
-		return;
-	}
-	
-	if (ENVELOPEstate==3) {
-			ENVELOPEvalue-=1/(ENVELOPEdecay*(2*fs-1)+1);
-
-		
-		if (ENVELOPEvalue<=0) {
-			ENVELOPEvalue=0;
-			ENVELOPEstate=0;
+		if (this.state==2) {
+			if (this.sustain==false) this.state=3;
+			return;
 		}
+	
+		if (this.state==3) {
+			this.value-=1/(this.decay*(2*fs-1)+1);
+
+			if (this.value<=0) {
+				this.value=0;
+				this.state=0;
+			}
 		
-		return;
+			return;
+		}
+
 	}
 
-}
+
+};
 
 
-function noteTrigger(v) {
-	console.log("trigger "+v);
-	ENVELOPEstate=1;
-	NoteValue=v;
-}
+var Synth = {
 
-function noteRelease(v) {
-	ENVELOPEstate=3;
-	console.log("release "+v);
-}
-
-function getAudio() {
-
-	// ENVELOPE
-	calcEnvelope();
+	params : {
+		// VCO
+		"vco-freq":440, // 8hz - 16khz
+		"vco-pwm":.5, // 0 - 1
+		"vco-wave":false, // false = Saw, true = Pulse
+		// VCO-MOD
+		"vco-mod-source":false, // false = LFO, true = EG
+		"vco-mod-amount":0,
+		"vco-mod-dest":false, // false = VCO, true = PWM
+		// LFO
+		"lfo-rate":5, // .2 - 600Hz
+		"lfo-wave":false, // false = Triangle, true = Square
+		"lfo-tracking":false,
+		// VCA
+		"vca-mode":false, // false = EF, true= ON
+		// VCF
+		"vcf-cutoff":20000, // 20hz - 20Khz
+		"vcf-res":0, // 0 - 1
+		"vcf-tracking":false,
+		// VCF-MOD
+		"vcf-mod-source":false, // false = LFO, true = EG
+		"vcf-mod-amount":0,
+		"vcf-mod-polarity":false,
+		// ENVELOPE
+		"envelope-sustain":true,
+		"envelope-attack":0, // 0 - 1 
+		"envelope-decay":0, // 0 - 1 
+		// NOTE
+		"note-glide":0 // 0 - 1
+		
+	},
 	
-	// LFO
-	var lfo_freq=LFOfreq;
-	if (LFOtracking==true) { lfo_freq*=Math.pow(2,NoteOutValue); }
-	LFOphase+=lfo_freq/fs;
+	vcoOut:0,
+	lfoOut:0,
+	
+	fs: 48000, // TODO : init
+	
+	new: function() {
+		var obj = Object.create(this);
+		obj._init();
+		return obj;
+	},
+	
+	_init: function() {
+		this.vco = Object.create(VCO);
+		this.lfo = Object.create(VCO);
+		this.vcf = Object.create(VCF);
+		this.eg = Object.create(EG);
+	},
+	
+	setParams:function(params) {
+		for (key in params) {
+		console.log('setParams',key);
+			if (! (key in this.params) ) continue;
+			this.params[key] = params[key];
+			
+			switch(key) {
+				case "vco-freq": this.vco.freq = params[key]; break; // ??
+				case "vco-pwm": this.vco.pwm = params[key]; break;
+				case "lfo-rate": this.lfo.freq = params[key]; break; // ??
+				case "vcf-cutoff": this.vcf.updateCutoff(params[key]); break;
+				case "vcf-res": this.vcf.updateRes(params[key]); break;
+				case "envelope-sustain": this.eg.sustain = params[key]; break;
+				case "envelope-attack": this.eg.attack = params[key]; break;
+				case "envelope-decay": this.eg.decay = params[key]; break;
+			}
+			
+		}
+	},
 
-	while(LFOphase<0) LFOphase+=1;
-	while(LFOphase>=1) LFOphase-=1;
+	noteValue:0,
+	noteOutValue:0,
+
+	noteTrigger: function(v) {
+		console.log("trigger "+v);
+		this.eg.state=1;
+		this.noteValue=v;
+	},
+
+	noteRelease: function(v) {
+		this.eg.state=3;
+		console.log("release "+v);
+	},
+
+	getAudio : function() {
+
+		// ENVELOPE
+		this.eg.calculate();
 	
-	if (LFOwave==false)
-		LFOout = triangle_lfo(LFOphase);
-	else 
-		LFOout = square_lfo(LFOphase);
+		// LFO
+		var lfo_freq=this.lfo.freq;
+		if (this.params["lfo-tracking"==true]) { lfo_freq*=Math.pow(2,this.noteOutValue); }
+		this.lfo.addPhase(lfo_freq/this.fs);
+		
+		if (this.params["lfo-wave"]==false)
+			this.lfoOut = this.lfo.triangle_lfo();
+		else
+			this.lfoOut = this.lfo.square_lfo();
 	
-	var pwm = VCOpwm;
-	//var phase = VCOphase;
+		var pwm = this.params['vco-pwm'];
+		var lfoPitch=1;
 	
-	var lfoPitch=1;
+		if (this.params["vco-mod-source"]==true) { // VCO MOD SOURCE == LFO
+			if (this.params["vco-mod-dest"]==false) { // VCO MOD DEST == FREQ
+				lfoPitch=Math.pow(2,this.eg.value*this.params["vco-mod-amount"]);
+			} else { // VCO MOD DEST == PWM
+				this.vco.pwm = (this.eg.value*this.params["vco-mod-amount"]+1)/2;
+			}
+		} else { // VCO MOD SOURCE == EG
+			if (this.params["vco-mod-dest"]==false) { // VCO MOD DEST == FREQ
+			//	lfoPitch=Math.pow(2,this.lfo.out*this.params["vco-mod-amount"]);
+			} else { // VCO MOD DEST == PWM
+				this.vco.pwm = (this.lfoOut*this.params["vco-mod-amount"]+1)/2;
+			}
+		}
+
+		// Note Glide
+		if (this.noteOutValue<this.noteValue) { 
+			this.noteOutValue+=1/(this.params["note-glide"]*(1*this.fs-1)+1); 
+			if (this.noteOutValue>this.noteValue) this.noteOutValue=this.noteValue; 
+		} 
+		else if (this.noteOutValue>this.noteValue) { 
+			this.noteOutValue-=1/(this.params["note-glide"]*(1*this.fs-1)+1); 
+			if (this.noteOutValue<this.noteValue) this.noteOutValue=this.noteValue; 
+		}
+		var notePitch = Math.pow(2,this.noteOutValue);
 	
-	if (VCOMODsource==true) {
-		if (VCOMODdest==false) {
-			lfoPitch=Math.pow(2,ENVELOPEvalue*VCOMODamount);
+		// VCO
+		this.vco.addPhase( (this.vco.freq*notePitch*lfoPitch)/fs );
+	
+		if (this.params["vco-wave"]==false)
+			this.vcoOut = this.vco.saw();
+		else
+			this.vcoOut = this.vco.pulse();
+		
+	
+		//VCF MOD
+		var cutoffPitch = 1;
+		var cutoffPitchSign= 1;
+		if (this.params["vcf-mod-polarity"]==false) cutoffPitchSign=-1;
+		if (this.params["vcf-mod-source"]==false) {
+			//cutoffPitch=Math.pow(2,this.lfoOut*this.params["vcf-mod-amount"]*4*cutoffPitchSign);
 		} else {
-			pwm = (ENVELOPEvalue*VCOMODamount+1)/2;
+			cutoffPitch=Math.pow(2,this.eg.value*this.params["vcf-mod-amount"]*4*cutoffPitchSign);
 		}
-	} else {
-		if (VCOMODdest==false) {
-			lfoPitch=Math.pow(2,LFOout*VCOMODamount);
-		} else {
-			pwm = (LFOout*VCOMODamount+1)/2;
-		}
+		var cutoff_freq = this.params["vcf-cutoff"];
+		if (this.params["vcf-tracking"]==true) { cutoff_freq*=Math.pow(2,this.noteOutValue); }
+		this.vcf.updateCutoff(cutoff_freq*cutoffPitch);
+
+		// filter
+		var out = this.vcf.filter(this.vcoOut);
+
+		// VCA
+		if (this.params["vca-mode"]==true) return out;
+		return out*this.eg.value;
+		
+		
 	}
 
-	// Note
-	 if (NoteOutValue<NoteValue) { NoteOutValue+=1/(NOTEglide*(1*fs-1)+1); if (NoteOutValue>NoteValue) NoteOutValue=NoteValue; }
-	 else if (NoteOutValue>NoteValue) { NoteOutValue-=1/(NOTEglide*(1*fs-1)+1); if (NoteOutValue<NoteValue) NoteOutValue=NoteValue; }
-	var notePitch = Math.pow(2,NoteOutValue);
-	
+};
 
-	// VCO
-	VCOphase+=(VCOfreq*notePitch*lfoPitch)/fs;
-
-	while(VCOphase<0) VCOphase+=1;
-	while(VCOphase>=1) VCOphase-=1;
-	
-	if (VCOwave==false)
-		VCOout = saw(VCOfreq,VCOphase);
-	else
-		VCOout = pulse(VCOfreq,VCOphase,pwm);
-		
-	
-		
-	//VCFMOD
-	var cutoffPitch = 1;
-	var cutoffPitchSign= 1;
-	if (VCFMODpolarity==false) cutoffPitchSign=-1;
-	if (VCFMODsource==false) {
-		cutoffPitch=Math.pow(2,LFOout*VCFMODamount*4*cutoffPitchSign);
-	} else {
-		cutoffPitch=Math.pow(2,ENVELOPEvalue*VCFMODamount*4*cutoffPitchSign);
-	}
-	var cutoff_freq = VCFcutoff;
-	if (VCFtracking==true) { cutoff_freq*=Math.pow(2,NoteOutValue); }
-	VCFUpdateCutoff(cutoff_freq*cutoffPitch);
-	
-	if (VCOout>1) VCOout=1;
-	if (VCOout<-1) VCOout=-1;
-	
-	//VCF - http://musicdsp.org/showArchiveComment.php?ArchiveID=24
-	var input = VCOout;
-	var x = input - VCFr*VCFy4;
-
-	//Four cascaded onepole filters (bilinear transform)
-	VCFy1=x*VCFp + VCFoldx*VCFp - VCFk*VCFy1;
-	VCFy2=VCFy1*VCFp+VCFoldy1*VCFp - VCFk*VCFy2;
-	VCFy3=VCFy2*VCFp+VCFoldy2*VCFp - VCFk*VCFy3;
-	VCFy4=VCFy3*VCFp+VCFoldy3*VCFp - VCFk*VCFy4;
-
-	//Clipper band limited sigmoid
-	VCFy4 -= (VCFy4*VCFy4*VCFy4)/6;
-
-	VCFoldx = x;
-	VCFoldy1 = VCFy1;
-	VCFoldy2 = VCFy2;
-	VCFoldy3 = VCFy3;
-	
-	if (VCFy4<-1) VCFy4=-1;
-	if (VCFy4>1) VCFy4=1;
-	
-	var out = VCFy4;
-
-	// VCA
-	if (VCAmode==true) return out;
-	return out*ENVELOPEvalue;
-}
-
-
-
-
-var bufferSize = 1024;
-var myPCMProcessingNode = audioContext.createScriptProcessor(bufferSize, 1, 1);
-myPCMProcessingNode.onaudioprocess = function(e) {
-  var output = e.outputBuffer.getChannelData(0);
-  for (var i = 0; i < bufferSize; i++) {
-     // Generate and copy over PCM samples.
-     output[i] = getAudio();
-  }
-}
-myPCMProcessingNode.connect(audioContext.destination);
 

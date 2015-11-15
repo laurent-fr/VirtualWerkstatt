@@ -3,7 +3,7 @@ $(document).ready(function($) {
 	$(".knob").knob({
 	                change : function (value) {
 						var id=this.$[0].id;
-						knob_change(id,value);
+						knob_change(id,value/100);
 					}
 					
 	});
@@ -33,7 +33,7 @@ $(document).ready(function($) {
 	
 	$(".knob").change(function(evt) {
 		var id = evt.currentTarget.id;
-		var value = evt.currentTarget.value;
+		var value = evt.currentTarget.value/100;
 		knob_change(id,value);
 		
 	});
@@ -46,38 +46,19 @@ $(document).ready(function($) {
 	
 	
 	function knob_change(id,value) {
-	console.log(id," ",value);
-		switch(id) {
-							case "vco-freq": VCOfreq=value;break;
-							case "vco-pwm": VCOpwm=value/100;break;
-							case "lfo-rate": LFOfreq=value;break;
-							case "vco-mod-amount": VCOMODamount=value/100; console.log(VCOMODamount); break;
-							case "vcf-cutoff" : VCFcutoff=value; VCFUpdateCutoff(VCFcutoff); break;
-							case "vcf-res" : VCFUpdateRes(value/100); break;
-							case "vcf-mod-amount": VCFMODamount = value/100; break;
-							case "envelope-attack": ENVELOPEattack = value/100; break;
-							case "envelope-decay": ENVELOPEdecay=value/100; break;
-							case "note-glide": NOTEglide=value/100; break;
-						
-						}
-	
+		console.log('knob_change',id," ",value);
+		var p = {};
+		p[id]=parseFloat(value);
+		synth.setParams(p);
 	}
 	
 	$("input[type=checkbox]").change( function(evt) {
 		console.log(evt.currentTarget.id,evt.currentTarget.checked);
 		var value=evt.currentTarget.checked;
-		switch(evt.currentTarget.id) {
-			case "vco-wave": VCOwave = value; break;
-			case "lfo-wave": LFOwave = value; break;
-			case "lfo-tracking": LFOtracking = value; break;
-			case "vcf-tracking": VCFtracking = value; break;
-			case "vco-mod-source" : VCOMODsource = value; break;
-			case "vco-mod-dest" : VCOMODdest = value; break;
-			case "envelope-sustain": ENVELOPEsustain = value ; break;
-			case "vcf-mod-source": VCFMODsource = value ; break;
-			case "vcf-mod-polarity": VCFMODpolarity = value ; break;
-			case "vca-mode": VCAmode = value; break;
-		}
+		var key = evt.currentTarget.id;
+		var p = {};
+		p[key]=value;
+		synth.setParams(p);
 	});
 	
 	$("#vco-wave").switchButton({
@@ -144,7 +125,7 @@ $(document).ready(function($) {
 			keyPressed = true;
 			$('#key-'+key).toggleClass("hovered");
 			//console.log(evt);
-			noteTrigger(keys[key]/12);
+			synth.noteTrigger(keys[key]/12);
 		}
 	});
 	
@@ -155,24 +136,24 @@ $(document).ready(function($) {
 			keyPressed = false;
 			$('#key-'+key).toggleClass("hovered");
 			//console.log(evt);
-			noteRelease(keys[key]/12);
+			synth.noteRelease(keys[key]/12);
 		}
 	});
 	
 	$(".piano-key").mousedown(function(evt) {
 		if (keyPressed==true) return;
 		keyPressed=true;
-		noteTrigger( keys[evt.currentTarget.id.substring(4,5)]/12 );
+		synth.noteTrigger( keys[evt.currentTarget.id.substring(4,5)]/12 );
 	});
 	
 	$(".piano-key").mouseup(function(evt) {
 		if (keyPressed==false) return;
 		keyPressed=false;
-		noteRelease( keys[evt.currentTarget.id.substring(4,5)]/12 );
+		synth.noteRelease( keys[evt.currentTarget.id.substring(4,5)]/12 );
 	});
 	
 	
-	$( "#lfo-tracking, #vcf-tracking, #vco-c4, #vco-8up, #vco-8down, #lfo-copy-vco, #lfo-plus-half,#lfo-minus-half" ).button();
+	$( ".toggle-button, .push-button" ).button();
 	
 	$("#vco-c4").click( function(evt) {
 		$('#vco-freq').val(revLogValue(261.626,8,16000)).trigger('change');
@@ -211,7 +192,9 @@ $(document).ready(function($) {
 	});
 	
 	setInterval(function() {
-		var intensity = Math.floor((LFOout+1)*128);
+		var intensity = Math.floor((synth.lfo.out+1)*128);
+		
+		//var intensity = Math.floor((synth.eg.value)*255);
 		
 		$('#lfo-led').css('background-color','rgb('+intensity+',0,0)');
 	}, 50);
@@ -219,26 +202,55 @@ $(document).ready(function($) {
 
 	
 	// INIT 
-	$('#vco-freq').val(revLogValue(261.626,8,16000)).trigger('change');
-    $('#vco-wave').prop('checked',false);
-	$('#vco-pwm').val(50).trigger('change');
-	$('#vco-mod-source').prop('checked',false);
-	$('#vco-mod-amount').val(0).trigger('change');
-	$('#vco-mod-dest').prop('checked',false);
-	$('#lfo-rate').val(revLogValue(5,0.2,600)).trigger('change');
-	$('#lfo-wave').prop('checked',false);
-	$('#lfo-tracking').prop('checked',false);
-	$('#vcf-cutoff').val(20000).trigger('change');
-	$('#vcf-res').val(0).trigger('change');
-	$('#vca-mode').prop('checked',false);
-	$('#vcf-mod-source').prop('checked',false);
-	$('#vcf-mod-amount').val(0).trigger('change');
-	$('#vcf-mod-polarity').prop('checked',true);
-	$('#envelope-sustain').prop('checked',true);
-	$('#envelope-attack').val(0).trigger('change');
-	$('#envelope-decay').val(25).trigger('change');
-	$('#note-glide').val(0).trigger('change');
+	var params = {
+		// VCO
+		"vco-freq":261.626, // 8hz - 16khz
+		"vco-pwm":.5, // 0 - 1
+		"vco-wave":false, // false = Saw, true = Pulse
+		// VCO-MOD
+		"vco-mod-source":false, // false = LFO, true = EG
+		"vco-mod-amount":0,
+		"vco-mod-dest":false, // false = VCO, true = PWM
+		// LFO
+		"lfo-rate":.5, // .2 - 600Hz
+		"lfo-wave":false, // false = Triangle, true = Square
+		"lfo-tracking":false,
+		// VCA
+		"vca-mode":false, // false = EF, true= ON
+		// VCF
+		"vcf-cutoff":20000, // 20hz - 20Khz
+		"vcf-res":0, // 0 - 1
+		"vcf-tracking":true,
+		// VCF-MOD
+		"vcf-mod-source":false, // false = LFO, true = EG
+		"vcf-mod-amount":0,
+		"vcf-mod-polarity":true,
+		// ENVELOPE
+		"envelope-sustain":true,
+		"envelope-attack":0, // 0 - 1
+		"envelope-decay":.3, // 0 - 1
+		// NOTE
+		"note-glide":0 // 0 - 1
+		
+	};
 	
+	
+	for(key in params) {
+		console.log('init:',key,params[key]);
+		var el = $('#'+key);
+		switch(el.get(0).className) {
+			case 'onoff-button': el.switchButton({ checked: params[key] }); break;
+			case 'toggle-button': el.prop('checked',params[key]).trigger('change'); break;
+			case 'knob': el.val(params[key]*100).trigger('change');
+			case 'knob-log':
+				switch(key) {
+					case 'vco-freq': $('#vco-freq').val(revLogValue(params[key],8,16000)).trigger('change'); break;
+					case 'lfo-rate': $('#lfo-rate').val(revLogValue(params[key],0.2,600)).trigger('change'); break;
+					case 'vcf-cutoff': $('#vcf-cutoff').val(revLogValue(params[key],20,20000)).trigger('change'); break;
+				}
+		}
+		
+	}
 	
 	
 });
