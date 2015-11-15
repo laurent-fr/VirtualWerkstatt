@@ -8,8 +8,6 @@ var freq_min=8;
 var freq_max=16000;
 var fs=44100;
 
-var final_amp=0.5;
-
 var table_def=[
 	{ f:8, n: 1000, l:4096 },
 	{ f:22, n: 500, l: 4096},
@@ -29,15 +27,17 @@ function table(n,length) {
 //var min=0;
 //var max=0;
 var out=[];
+var amp=1.6;
 
   for(t=0;t<length;t++) {
 	out[t]=0;
 	for(i=1;i<=n;i ++) {
 		out[t]+=(1/i)*Math.sin(i*t*2*Math.PI/length);
 	}
-	out[t]*=final_amp;
-
+	out[t]=-(amp/Math.PI)*out[t];
+	if ((out[t]<-1)||(out[t]>1)||(isNaN(out[t]))) console.log('ERR !',t,out[t]);
   }
+  
   return out;	
 }
 
@@ -138,11 +138,11 @@ fs.writeFileSync(out_file, js);
 
 
 
-/*var plot='';
+var plot='';
 var data_plot=table(60,512);
 for(i=0;i<data_plot.length;i++) { plot+=i+" "+data_plot[i]+ "\r\n";}
 fs.writeFileSync('out.dat',plot);
-*/
+
 
 
 //console.log(table(10,4096));

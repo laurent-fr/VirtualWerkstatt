@@ -5,15 +5,24 @@ var VCO = {
 	phase:0, // 0 - 1
 	freq:0,
 	pwm:0, // 0 - 1
+	fs: 48000,
+	
+	new: function(fs) {
+		var obj = Object.create(this);
+		if (!(typeof fs==='undefined')) this.fs=fs;
+		return obj;
+	},
 	
 	_interpolate: function(table,p) {
 		if (typeof p === 'undefined') p = this.phase*table.length;
 		var t = Math.floor(p);
 		var frac = p-t;  
 		var t1=t+1;
-		if (t1==length) t1=0;
+		if (t1==table.length) t1=0;
 		
 		var out = table[t]*(1-frac)+table[t1]*frac;
+		
+		if (isNaN(out)) console.log('interpolate',t,frac,t1,table.length);
 		
 		if (out<-1) out=-1;
 		if (out>1) out=1;
@@ -36,8 +45,22 @@ var VCO = {
 		return num;
 	},
 	
-	addPhase: function(value)  {
-		this.phase+=value;
+	setFreq: function(freq) {
+		//if (isNaN(this.freq)) { console.log('Freq NaN!');  }
+		if (freq<0) freq=0;
+		if (freq>20000) freq=20000;
+		this.freq=freq;
+	},
+	
+	setPwm: function(pwm) {
+		if (pwm<0) pwm=0;
+		if (pwm>1) pwm=1;
+		this.pwm=pwm;
+	},
+	
+	_addPhase: function()  {
+		//if (isNaN(this.phase)) { console.log('Phase NaN!'); this.phase=0; }
+		this.phase+=this.freq/this.fs;
 		while (this.phase>1) this.phase-=1;
 		while (this.phase<0) this.phase+=1;
 	},
@@ -47,30 +70,35 @@ var VCO = {
 	},
 	
 	saw: function() {  
+		this._addPhase();
 		var num = this._get_table();
 		
-		this.out = this._interpolate(saw_table[num]);
+		this.out = this._interpolate(saw_table[num])/2;
 		return this.out;
 	},
 
 	pulse: function() {
+		this._addPhase();
+		
 		var t=this.phase+this.pwm;
 		while(t>=1) t-=1;
 	
 		var num = this._get_table();
 	
-		this.out=(this._saw(num,this.phase)-this._saw(num,t))*0.9+0.5-this.pwm;
+		this.out=(this._saw(num,this.phase)-this._saw(num,t))*0.9+(this.pwm*2-1)*0.7;
 		if (this.out<-1) this.out=-1;
 		if (this.out>1) this.out=1;
 		return this.out;
   	},
 	
 	triangle_lfo: function() {
+		this._addPhase();
 		this.out = this._interpolate(triangle_table);
 		return this.out;
 	},
 
 	square_lfo: function() {
+		this._addPhase();
 		this.out = this._interpolate(square_table);
 		return this.out;
 	}
@@ -87,11 +115,18 @@ var VCF = {
 	y1:0, y2:0, y3:0, y4:0,
 	oldy1:0, oldy2:0, oldy3:0,
 	oldx:0,
+	fs: 48000,
+	
+	new: function(fs) {
+		var obj = Object.create(this);
+		if (!(typeof fs==='undefined')) this.fs=fs;
+		return obj;
+	},
 
 	updateCutoff: function(cutoff) {
 		if (cutoff<0) cutoff=0;
 		if (cutoff>20000) cutoff=20000;
-		var fc = cutoff*2/fs;
+		var fc = cutoff*2/this.fs;
 		this.p = fc*(1.8-0.8*fc);
 		this.k = 2*Math.sin(fc*Math.PI/2)-1;
 	},
@@ -140,11 +175,18 @@ var EG = {
 	attack:0,
 	release:0,
 	sustain:false,
+	fs:48000,
+	
+	new: function(fs) {
+		var obj = Object.create(this);
+		if (!(typeof fs==='undefined')) this.fs=fs;
+		return obj;
+	},
 
 	calculate: function() {
 	
 		if (this.state==1) {
-			this.value+=1/(this.attack*(1*fs-1)+1);
+			this.value+=1/(this.attack*(1*this.fs-1)+1);
 		
 			if (this.value>=1) {
 				this.value=1;
@@ -159,7 +201,7 @@ var EG = {
 		}
 	
 		if (this.state==3) {
-			this.value-=1/(this.decay*(2*fs-1)+1);
+			this.value-=1/(this.decay*(2*this.fs-1)+1);
 
 			if (this.value<=0) {
 				this.value=0;
@@ -212,19 +254,20 @@ var Synth = {
 	vcoOut:0,
 	lfoOut:0,
 	
-	fs: 48000, // TODO : init
+	fs: 48000, 
 	
-	new: function() {
+	new: function(fs) {
 		var obj = Object.create(this);
+		if (!(typeof fs==='undefined')) this.fs=fs;
 		obj._init();
 		return obj;
 	},
 	
 	_init: function() {
-		this.vco = Object.create(VCO);
-		this.lfo = Object.create(VCO);
-		this.vcf = Object.create(VCF);
-		this.eg = Object.create(EG);
+		this.vco = VCO.new(this.fs);
+		this.lfo = VCO.new(this.fs);
+		this.vcf = VCF.new(this.fs);
+		this.eg = EG.new(this.fs);
 	},
 	
 	setParams:function(params) {
@@ -233,10 +276,8 @@ var Synth = {
 			if (! (key in this.params) ) continue;
 			this.params[key] = params[key];
 			
-			switch(key) {
-				case "vco-freq": this.vco.freq = params[key]; break; // ??
-				case "vco-pwm": this.vco.pwm = params[key]; break;
-				case "lfo-rate": this.lfo.freq = params[key]; break; // ??
+			switch(key) {		
+				case "vco-pwm": this.vco.setPwm(params[key]); break;
 				case "vcf-cutoff": this.vcf.updateCutoff(params[key]); break;
 				case "vcf-res": this.vcf.updateRes(params[key]); break;
 				case "envelope-sustain": this.eg.sustain = params[key]; break;
@@ -267,9 +308,9 @@ var Synth = {
 		this.eg.calculate();
 	
 		// LFO
-		var lfo_freq=this.lfo.freq;
-		if (this.params["lfo-tracking"==true]) { lfo_freq*=Math.pow(2,this.noteOutValue); }
-		this.lfo.addPhase(lfo_freq/this.fs);
+		var lfo_freq=this.params['lfo-rate'];
+		if (this.params["lfo-tracking"]==true) { lfo_freq*=Math.pow(2,this.noteOutValue); }
+		this.lfo.setFreq(lfo_freq);
 		
 		if (this.params["lfo-wave"]==false)
 			this.lfoOut = this.lfo.triangle_lfo();
@@ -279,17 +320,17 @@ var Synth = {
 		var pwm = this.params['vco-pwm'];
 		var lfoPitch=1;
 	
-		if (this.params["vco-mod-source"]==true) { // VCO MOD SOURCE == LFO
+		if (this.params["vco-mod-source"]==true) { // VCO MOD SOURCE == EG
 			if (this.params["vco-mod-dest"]==false) { // VCO MOD DEST == FREQ
 				lfoPitch=Math.pow(2,this.eg.value*this.params["vco-mod-amount"]);
 			} else { // VCO MOD DEST == PWM
-				this.vco.pwm = (this.eg.value*this.params["vco-mod-amount"]+1)/2;
+				this.vco.setPwm(pwm+this.eg.value*this.params["vco-mod-amount"]/2);
 			}
-		} else { // VCO MOD SOURCE == EG
-			if (this.params["vco-mod-dest"]==false) { // VCO MOD DEST == FREQ
-			//	lfoPitch=Math.pow(2,this.lfo.out*this.params["vco-mod-amount"]);
+		} else { // VCO MOD SOURCE == LFO
+			if (this.params["vco-mod-dest"]==false) { // VCO MOD DEST == FREQ		
+				lfoPitch=Math.pow(2,this.lfo.out*this.params["vco-mod-amount"]);
 			} else { // VCO MOD DEST == PWM
-				this.vco.pwm = (this.lfoOut*this.params["vco-mod-amount"]+1)/2;
+				this.vco.setPwm(pwm+this.lfoOut*this.params["vco-mod-amount"]/2);
 			}
 		}
 
@@ -305,7 +346,10 @@ var Synth = {
 		var notePitch = Math.pow(2,this.noteOutValue);
 	
 		// VCO
-		this.vco.addPhase( (this.vco.freq*notePitch*lfoPitch)/fs );
+		/*if (isNaN(this.params['vco-freq']*notePitch*lfoPitch)) {
+		console.log('problem',this.params['vco-freq'],notePitch,lfoPitch);
+		}*/
+		this.vco.setFreq(this.params['vco-freq']*notePitch*lfoPitch);
 	
 		if (this.params["vco-wave"]==false)
 			this.vcoOut = this.vco.saw();
@@ -318,7 +362,7 @@ var Synth = {
 		var cutoffPitchSign= 1;
 		if (this.params["vcf-mod-polarity"]==false) cutoffPitchSign=-1;
 		if (this.params["vcf-mod-source"]==false) {
-			//cutoffPitch=Math.pow(2,this.lfoOut*this.params["vcf-mod-amount"]*4*cutoffPitchSign);
+			cutoffPitch=Math.pow(2,this.lfoOut*this.params["vcf-mod-amount"]*4*cutoffPitchSign);
 		} else {
 			cutoffPitch=Math.pow(2,this.eg.value*this.params["vcf-mod-amount"]*4*cutoffPitchSign);
 		}
@@ -328,6 +372,7 @@ var Synth = {
 
 		// filter
 		var out = this.vcf.filter(this.vcoOut);
+		
 
 		// VCA
 		if (this.params["vca-mode"]==true) return out;
