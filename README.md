@@ -5,6 +5,10 @@ Try it online here (warning, sound !) : http://laurent-fr.github.io/VirtualWerks
 
 Have a look at the real thing here : http://www.moogmusic.com/products/semi-modular/werkstatt-01-moogfest-2014-kit
 
+## Status :
+
+new javascript code: better, cleaner !
+
 ## Building the sources :
 
 ### Prerequisites :
@@ -41,7 +45,7 @@ You can play notes by clicking on the virtual keyboard on the bottom on the scre
   * VCO MOD : you can modulate the VCO signal either with the LFO or the Envelope Generator (EG), with an amount from 0 to 100 (1 octave or 100%pwm).
   DEST applies the modulation either to the pitch (FREQ) or the duty cycle of the pulse wavve (PWM)
 
-  * LFO : generates a triangle ( /\/\/\ ) or a square ( _||_||_ ) signal (0.2hz-600hz)
+  * LFO : generates a triangle ( /\/\/\ ) or a square ( _||_||_ ) signal (0.2hz-600hz).
 
   * VCF : low pass filter (24db/octave), cutoff from 0hz to 20khz, with resonnance (RES) at cutoff frequency  (0=none, 100=100%)
 
