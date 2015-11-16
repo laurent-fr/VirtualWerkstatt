@@ -210,9 +210,46 @@ $(document).ready(function($) {
 	
 	presets.change( function(evt) {
 		setParams(paramList[$("#presets").val()]);
-		$(document).focus();
+		$('#key-s').focus();
 	});
 	
+	//random
+	$('#random').button();
+	$('#random').click( function(evt) {
+		var freq = 261.626/Math.ceil(Math.random()*4);
+		var cutoff = Math.random()*(20000-freq)+freq;
+		var lfo = Math.random()<.5?Math.random()*10+.2:Math.random()*599.8+.2;
+		setParams({
+				"vco-freq":freq, // 8hz - 16khz
+				"vco-pwm": Math.random(), // 0 - 1
+				"vco-wave":Math.random()<.5?false:true, // false = Saw, true = Pulse
+				// VCO-MOD
+				"vco-mod-source":Math.random()<.5?false:true, // false = LFO, true = EG
+				"vco-mod-amount": Math.random(),
+				"vco-mod-dest":Math.random()<.5?false:true, // false = VCO, true = PWM
+				// LFO
+				"lfo-rate":lfo, // .2 - 600Hz
+				"lfo-wave":Math.random()<.5?false:true, // false = Triangle, true = Square
+				"lfo-tracking":Math.random()<.5?false:true,
+				// VCA
+				"vca-mode":false, // false = EF, true= ON
+				// VCF
+				"vcf-cutoff":cutoff, // 20hz - 20Khz
+				"vcf-res": Math.random(), // 0 - 1
+				"vcf-tracking":Math.random()<.5?false:true,
+				// VCF-MOD
+				"vcf-mod-source":Math.random()<.5?false:true, // false = LFO, true = EG
+				"vcf-mod-amount": Math.random(),
+				"vcf-mod-polarity":Math.random()<.5?false:true,
+				// ENVELOPE
+				"envelope-sustain":Math.random()<.5?false:true,
+				"envelope-attack":Math.random(), // 0 - 1
+				"envelope-decay": Math.random(), // 0 - 1
+				// NOTE
+				"note-glide": Math.random()<.5?0:Math.random() // 0 - 1
+
+			});
+	});
 	
 	function setParams(params) {
 		for(var key in params) {
