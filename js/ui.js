@@ -54,8 +54,8 @@ $(document).ready(function($) {
 		synth.setParams(p);
 	}
 	
-	$("input[type=checkbox]").change( function(evt) {
-		console.log(evt.currentTarget.id,evt.currentTarget.checked);
+	$(".onoff-button, .toggle-button").change( function(evt) {
+		console.log('checkbox',evt.currentTarget.id,evt.currentTarget.checked);
 		var value=evt.currentTarget.checked;
 		var key = evt.currentTarget.id;
 		var p = {};
@@ -202,57 +202,40 @@ $(document).ready(function($) {
 	}, 50);
 	
 
-	
-	// INIT 
-	var params = {
-		// VCO
-		"vco-freq":261.626, // 8hz - 16khz
-		"vco-pwm":.5, // 0 - 1
-		"vco-wave":false, // false = Saw, true = Pulse
-		// VCO-MOD
-		"vco-mod-source":false, // false = LFO, true = EG
-		"vco-mod-amount":0,
-		"vco-mod-dest":false, // false = VCO, true = PWM
-		// LFO
-		"lfo-rate":.5, // .2 - 600Hz
-		"lfo-wave":false, // false = Triangle, true = Square
-		"lfo-tracking":false,
-		// VCA
-		"vca-mode":false, // false = EF, true= ON
-		// VCF
-		"vcf-cutoff":20000, // 20hz - 20Khz
-		"vcf-res":0, // 0 - 1
-		"vcf-tracking":true,
-		// VCF-MOD
-		"vcf-mod-source":false, // false = LFO, true = EG
-		"vcf-mod-amount":0,
-		"vcf-mod-polarity":true,
-		// ENVELOPE
-		"envelope-sustain":true,
-		"envelope-attack":0, // 0 - 1
-		"envelope-decay":.3, // 0 - 1
-		// NOTE
-		"note-glide":0 // 0 - 1
-		
-	};
-	
-	
-	for(var key in params) {
-		console.log('init:',key,params[key]);
-		var el = $('#'+key);
-		switch(el.get(0).className) {
-			case 'onoff-button': el.switchButton({ checked: params[key] }); break;
-			case 'toggle-button': el.prop('checked',params[key]).trigger('change'); break;
-			case 'knob': el.val(params[key]*100).trigger('change');
-			case 'knob-log':
-				switch(key) {
-					case 'vco-freq': $('#vco-freq').val(revLogValue(params[key],8,16000)).trigger('change'); break;
-					case 'lfo-rate': $('#lfo-rate').val(revLogValue(params[key],0.2,600)).trigger('change'); break;
-					case 'vcf-cutoff': $('#vcf-cutoff').val(revLogValue(params[key],20,20000)).trigger('change'); break;
-				}
-		}
-		
+	// presets
+	var presets = $("#presets");
+	for (var param in paramList) {
+		presets.append('<option name="'+param+'">'+param+'</option>');
 	}
+	
+	presets.change( function(evt) {
+		setParams(paramList[$("#presets").val()]);
+		$(document).focus();
+	});
+	
+	
+	function setParams(params) {
+		for(var key in params) {
+			var el = $('#'+key);
+			var className = el.get(0).classList[0];
+			console.log('init:',key,params[key],className);
+			switch(className) {
+				case 'onoff-button': el.switchButton({ checked: params[key] }); break;
+				case 'toggle-button': console.log("eeee");el.prop('checked',params[key]).trigger('change'); break;
+				case 'knob': el.val(params[key]*100).trigger('change');
+				case 'knob-log':
+					switch(key) {
+						case 'vco-freq': $('#vco-freq').val(revLogValue(params[key],8,16000)).trigger('change'); break;
+						case 'lfo-rate': $('#lfo-rate').val(revLogValue(params[key],0.2,600)).trigger('change'); break;
+						case 'vcf-cutoff': $('#vcf-cutoff').val(revLogValue(params[key],20,20000)).trigger('change'); break;
+					}
+			}
+			
+		}
+	}
+	
+	// init
+	setParams(paramList['default']);
 	
 	
 });

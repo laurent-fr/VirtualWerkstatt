@@ -144,3 +144,13 @@ body {
 .ui-button-text {
 	font-size:50%;
 }
+
+.preset {
+	text-align:center;
+	margin-left:10px;
+}	
+
+.preset p {
+	color: #eee;
+	font-weight:bold;
+}
