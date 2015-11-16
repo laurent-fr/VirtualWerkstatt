@@ -7,9 +7,9 @@
 
 <script src="js/lib.562d872adcf5315bdbd4.js"></script>
 
-<link rel="stylesheet" href="css/app.e08145d6744e517cc752.css">
+<link rel="stylesheet" href="css/app.cf3caa17e2f05a2bf658.css">
 
-<script src="js/app.94ace2c30c48469e4d0b.js"></script>
+<script src="js/app.c301d09820adad3cde4f.js"></script>
 
 
 </head>
@@ -37,11 +37,11 @@
 					</div>
 					
 					<div class="pure-u-1-3 box-content">
-						<p><input id="vco-wave" type="checkbox"></p>
+						<p><input id="vco-wave" class="onoff-button" type="checkbox"></p>
 					</div>
 			
 					<div class="pure-u-1-3 box-content">
-						<input id="vco-pwm" class="knob" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333" value="50">
+						<input id="vco-pwm" class="knob" data-min="0" data-max="100" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333" value="50">
 						
 					</div>
 				
@@ -51,7 +51,7 @@
 				<div class="pure-u-1">
 				<div class="pure-g" >
 					<div class="pure-u-1-3 box-label">
-						<p>FREQ <button id="vco-c4">C4</button> <button id="vco-8down">-8</button> <button id="vco-8up">+8</button>
+						<p>FREQ <button class="push-button" id="vco-c4">C4</button> <button class="push-button" id="vco-8down">-8</button> <button class="push-button" id="vco-8up">+8</button>
 					</div>
 					<div class="pure-u-1-3 box-label">
 						<p>WAVE</p>
@@ -83,7 +83,7 @@
 						
 					</div>
 					<div class="pure-u-1-2 box-content">
-						<input id="vcf-res" class="knob" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333">	
+						<input id="vcf-res" class="knob" data-min="0" data-max="100" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333">	
 					</div>
 				</div>
 				</div>
@@ -91,7 +91,7 @@
 				<div class="pure-u-1">
 				<div class="pure-g" >
 					<div class="pure-u-1-2 box-label">
-						<p>CUTOFF <input type="checkbox" id="vcf-tracking"><label for="vcf-tracking">Tracking</label></p></p>
+						<p>CUTOFF <input type="checkbox" class="toggle-button" id="vcf-tracking"><label for="vcf-tracking">Tracking</label></p></p>
 					</div>
 					<div class="pure-u-1-2 box-label">
 						<p>RES</p>
@@ -112,7 +112,7 @@
 				<div class="pure-u-1">
 				<div class="pure-g" >
 					<div class="pure-u-1-1 box-content">
-						<p><input id="vca-mode" type="checkbox"></p>
+						<p><input id="vca-mode" class="onoff-button" type="checkbox"></p>
 					</div>
 				</div>
 				</div>
@@ -138,16 +138,16 @@
 					<div class="pure-u-1">
 					<div class="pure-g" >
 						<div class="pure-u-1-3 box-content">
-							<p><input id="vco-mod-source" type="checkbox" ></p>
+							<p><input id="vco-mod-source" class="onoff-button" type="checkbox" ></p>
 						</div>
 						
 						<div class="pure-u-1-3 box-content">
-							<input id="vco-mod-amount" class="knob" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333">
+							<input id="vco-mod-amount" class="knob" data-min="0" data-max="100" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333">
 
 						</div>
 
 						<div class="pure-u-1-3 box-content">
-							<p><input id="vco-mod-dest" type="checkbox" ></p>
+							<p><input id="vco-mod-dest" class="onoff-button" type="checkbox" ></p>
 						</div>
 						
 					</div>
@@ -178,16 +178,16 @@
 				<div class="pure-u-1">
 				<div class="pure-g" >
 					<div class="pure-u-1-3 box-content">
-						<p><input id="vcf-mod-source" type="checkbox"></p>
+						<p><input id="vcf-mod-source" class="onoff-button" type="checkbox"></p>
 					</div>
 					
 					<div class="pure-u-1-3 box-content">
-						<input id="vcf-mod-amount" class="knob" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333" value="35">
+						<input id="vcf-mod-amount" class="knob" data-min="0" data-max="100" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333" value="35">
 
 					</div>
 
 					<div class="pure-u-1-3 box-content">
-						<p><input id="vcf-mod-polarity" type="checkbox" ></p>
+						<p><input id="vcf-mod-polarity" class="onoff-button" type="checkbox" ></p>
 					</div>
 					
 				</div>
@@ -231,7 +231,7 @@
 						</div>
 
 						<div class="pure-u-1-2 box-content">
-							<p><input id="lfo-wave" type="checkbox" ></p>
+							<p><input id="lfo-wave" class="onoff-button" type="checkbox" ></p>
 						</div>
 
 					</div>
@@ -241,7 +241,13 @@
 					<div class="pure-g" >
 						<div class="pure-u-1-12"> </div>
 						<div class="pure-u-5-12 box-label">
-							<p>RATE <input type="checkbox" id="lfo-tracking"><label for="lfo-tracking">Tracking</label></p>
+							<p>RATE
+								<input type="checkbox" class="toggle-button" id="lfo-tracking"><label for="lfo-tracking">Tracking</label>
+								<button class="push-button" id="lfo-copy-vco">=VCO</button>
+								<button class="push-button" id="lfo-minus-half">-1/2</button>
+								<button class="push-button" id="lfo-plus-half">+1/2</button>
+								
+							</p>
 						</div>
 						<div class="pure-u-1-2 box-label">
 							<p>WAVE</p>
@@ -260,15 +266,15 @@
 				<div class="pure-u-1">
 				<div class="pure-g" >
 					<div class="pure-u-1-3 box-content">
-						<p><input id="envelope-sustain" type="checkbox"></p>
+						<p><input id="envelope-sustain" class="onoff-button" type="checkbox"></p>
 					</div>
 					
 					<div class="pure-u-1-3 box-content">
-						<input id="envelope-attack" class="knob" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333">
+						<input id="envelope-attack" class="knob" data-min="0" data-max="100" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333">
 					</div>
 					
 					<div class="pure-u-1-3 box-content">
-						<input id="envelope-decay" class="knob" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333">
+						<input id="envelope-decay" class="knob" data-min="0" data-max="100" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333">
 					</div>
 
 					
@@ -296,7 +302,16 @@
 	</div>
 	
 	<div class="pure-g piano" >
-		<div class="pure-u-1-3">
+		<div class="pure-u-2-24">
+			
+			<div class="preset">
+				<select id="presets">
+				</select>
+				<div><button id="random">Random</button></div>
+			</div>
+		</div>
+	
+		<div class="pure-u-6-24">
 		<div class="pure-g piano-content">
 			<div class="pure-u-1 box-content">
 			<input id="note-glide" class="knob" data-angleOffset=-125 data-angleArc=250 data-fgColor="#8fc800" data-width="140" data-height="140" data-bgcolor="#333333">
@@ -306,6 +321,7 @@
 			</div>
 		</div>
 		</div>
+		
 		
 		<div class="pure-u-1-24"><button id="key-s" class="piano-key bottom">S</button></div>
 		<div class="pure-u-1-24"><button id="key-e" class="piano-key top">E</button></div>
